@@ -9,5 +9,9 @@ the Ally's.
 
 Install instructions:
 ```bash
+git clone https://github.com/hhd-dev/gamescope-plusplus
+cd gamescope-plusplus
 
+makepkg -s
+sudo pacman -U gamescope-plusplus-* 
 ```

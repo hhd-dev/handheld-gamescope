@@ -1,4 +1,4 @@
-# Gamescope Plus Plus
+# Handheld Gamescope
 An up to date version of gamescope, patched with the latest ChimeraOS patch
 series, and the Bazzite patch series, while including the reshade repos.
 
@@ -9,9 +9,9 @@ the Ally's.
 
 Install instructions:
 ```bash
-git clone https://github.com/hhd-dev/gamescope-plusplus
-cd gamescope-plusplus
+git clone https://github.com/hhd-dev/handheld-gamescope
+cd handheld-gamescope
 
 makepkg -s
-sudo pacman -U gamescope-plusplus-* 
+sudo pacman -U handheld-gamescope-* 
 ```

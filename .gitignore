@@ -1,10 +1,5 @@
 *
 !PKGBUILD
-!glm_exper.patch
-!chimeraos.patch
-!crashfix.patch
-!add_720p_var.patch
-!touch_gestures_env.patch
-!legion_go.patch
+!*.patch
 !readme.md
 !.gitignore

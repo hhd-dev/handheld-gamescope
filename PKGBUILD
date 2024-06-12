@@ -1,49 +1,50 @@
 _pkgname=gamescope
 pkgname=handheld-${_pkgname}
-pkgver=3.14.12
+pkgver=3.14.18
 pkgrel=1
 pkgdesc='Gamescope with reshade+legion_go+chimeraos patches. Based on the Bazzite version.'
 arch=(x86_64)
 url=https://github.com/ValveSoftware/gamescope
 license=(BSD)
 depends=(
-    gcc-libs
-    glibc
-    glm
-    libavif
-    libcap.so
-    libdecor
-    libdisplay-info.so
-    libdrm
-    libliftoff.so
-    libpipewire-0.3.so
-    libx11
-    libxcb
-    libxcomposite
-    libxdamage
-    libxext
-    libxfixes
-    libxkbcommon.so
-    libxmu
-    libxrender
-    libxres
-    libxtst
-    libxxf86vm
-    openvr
-    sdl2
-    vulkan-icd-loader
-    wayland
-    libei
-    xorg-server-xwayland
+  gcc-libs
+  glibc
+  glm
+  libavif
+  libcap.so
+  libdecor
+  libdisplay-info.so
+  libdrm
+  libliftoff.so
+  libpipewire-0.3.so
+  libvulkan.so
+  libwlroots.so
+  libx11
+  libxcb
+  libxcomposite
+  libxdamage
+  libxext
+  libxfixes
+  libxkbcommon.so
+  libxmu
+  libxrender
+  libxres
+  libxtst
+  libxxf86vm
+  openvr
+  sdl2
+  vulkan-icd-loader
+  wayland
+  xorg-server-xwayland
 )
 makedepends=(
-    benchmark
-    git
-    glslang
-    meson
-    ninja
-    vulkan-headers
-    wayland-protocols
+  benchmark
+  git
+  glslang
+  meson
+  ninja
+  vulkan-headers
+  wayland-protocols
 )
 
 source=(
@@ -63,7 +64,7 @@ source=(
     # Add touch gestures to open menus (currently broken)
     gestures.patch
 )
-b2sums=('fec50850315c404e1805285038dd2715ac96de1132a412e03b2992c6fc11e8eacf1035d8012356c32a37fcaab02234ecf79e31169e48eb8599586a5c27207c84'
+b2sums=('bcdfcfdb7636d10c9d4450e03b252669a6ce9d5d21d241cde12bbf29feffaaf72bb785dce96682f43c25e0797cd6e5d13677e247d7c921e63ca1c27c8af04cb0'
         'SKIP'
         'SKIP'
         '671573b584409c122786f34521cab934df00381cdf708714fa4db29b386b11216ba41758ec58e27b0bc4a522f2e5ca5535f2c173b92bfe22baa8bfbcd2a490b4'
@@ -72,21 +73,27 @@ b2sums=('fec50850315c404e1805285038dd2715ac96de1132a412e03b2992c6fc11e8eacf1035d
         'd072133be1334344b32891b44fdb970b10566d521150607962a4f34057690b08fe2ed03d17a8a622a247f75719cdd186fc1e5be63730f6b7c60f3eb47a8ec008'
         '9f33d880f8ea85e7b7740c0651d261767fe00ebe9dde4cfec7932b4d02628a8d14dc6460428f8a04e51404bab406d49c178a82d6f0dc3dbf53d2b48eff028ae4'
         '68ebfbd6bf33fb12c55ca8cac51e8eaa4111dc97a1a23bbc5ec8edaf3b80be0f9b94d815f61b4d98c6ff57026d453795e3bbeb138cf1bd85027d0a2a7258f4e6'
-        'd336216b658d825f58ad2594c6139117a457431b33f6574b3caf188c3f8e7e9b60a2142a02a0eb0087ba984fe391f3b49fca241cd258aef17aa416da4bc71e4d')
+        '71eca86fb6bdd36f8a142b68b76cb63f6301b8a111bfb2d9bf16c18afddf20d5f7fb2bfe0018d292908dae351365814ecda1ba0140a256bfcedffd252bc397c6')
 
 provides=("$_pkgname")
 conflicts=("$_pkgname")
 
 prepare() {
-    cd $_pkgname
-    # This really should be a pacman feature...
-    for src in "${source[@]}"; do
-        src="${src%%::*}"
-        src="${src##*/}"
-        [[ $src = *.patch ]] || continue
-        echo "Applying patch $src..."
-        git apply "../$src"
-    done
+  cd $_pkgname
+
+  local src
+  for src in "${source[@]}"; do
+    src="${src%%::*}"
+    src="${src##*/}"
+    src="${src%.zst}"
+    [[ $src = *.patch ]] || continue
+    echo "----- Applying patch ./$src"
+    # Allow going to reject path through vs code terminal
+    patch -Np1 < "../$src" | sed -e "s/saving rejects to file /saving rejects to file ${PWD//\//\\/}\//g"
+    if [ ${PIPESTATUS[0]} -ne 0 ]; then
+      exit ${PIPESTATUS[0]}
+    fi
+  done
     
   meson subprojects download
   git submodule init src/reshade
@@ -99,7 +106,8 @@ prepare() {
 build() {
   arch-meson gamescope build \
     -Dforce_fallback_for=stb \
-    -Dpipewire=enabled
+    -Dpipewire=enabled \
+    -Dinput_emulation=enabled
   meson compile -C build
 }
 
@@ -108,3 +116,5 @@ package() {
     --skip-subprojects
   install -Dm 644 gamescope/LICENSE -t "${pkgdir}"/usr/share/licenses/gamescope/
 }
+
+# vim: ts=2 sw=2 et:

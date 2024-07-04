@@ -1,7 +1,7 @@
 _pkgname=gamescope
 pkgname=handheld-${_pkgname}
 pkgver=3.13.19
-pkgrel=2
+pkgrel=3
 pkgdesc='Gamescope with reshade+legion_go+chimeraos patches. Based on the Bazzite version.'
 arch=(x86_64)
 url=https://github.com/ValveSoftware/gamescope
@@ -104,8 +104,12 @@ prepare() {
 }
 
 build() {
+  # FIXME: Fix werror failing on transposed-args
   arch-meson gamescope build \
-    -Dforce_fallback_for=stb \
+    -Dforce_fallback_for=stb,wlroots,libliftoff,vkroots,libinput \
+    -Denable_openvr_support=false \
+    -Dlibliftoff:werror=false \
+    -Dwlroots:werror=false \
     -Dpipewire=enabled
   meson compile -C build
 }

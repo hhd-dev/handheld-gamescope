@@ -1,7 +1,7 @@
 _pkgname=gamescope
 pkgname=handheld-${_pkgname}
-pkgver=3.14.22
-pkgrel=1
+pkgver=g37cc4d36
+pkgrel=3
 pkgdesc='The Bazzite gamescope forked for Arch. May have extra fixes or a tiny bit held back.'
 arch=(x86_64)
 url=https://github.com/ValveSoftware/gamescope
@@ -45,7 +45,7 @@ makedepends=(
   vulkan-headers
   wayland-protocols
 )
-_tag=3b69847e15c84c0a4f93e82c2eb16b623f9765b9
+_tag=37cc4d368b3804215b9b4bb2719a3ac2b64cf2e6
 source=(
   git+https://github.com/ValveSoftware/gamescope.git#tag=${_tag}
   git+https://github.com/Joshua-Ashton/wlroots.git
@@ -67,10 +67,10 @@ source=(
   # https://github.com/ValveSoftware/gamescope/issues/1369
   revert-299bc34.patch
   # https://github.com/ValveSoftware/gamescope/pull/1231
-  1231.patch   
+  1231.patch
 )
 
-b2sums=('5f2fd5a052da71a8daf8518e306d0bfc49802f7e246cc3d9f454dce6a482eadc2c43db5c5458bd9ad4074c18bcd4ccad91da14a92f2df17671667c47da7b55c2'
+b2sums=('7f36e6ca039b2e0be6d89d2bb287b269f7ec5394e6587cabf202a737aaf95ee8f883d4ef44e674ff8ed09b2a1cb56fb4acdb1764fe14f5e1709f80ba0f40a3c8'
         'SKIP'
         'SKIP'
         'SKIP'
@@ -131,10 +131,10 @@ prepare() {
   git -c protocol.file.allow=always submodule update
 }
 
-pkgver() {
-  cd gamescope
-  git describe --tags | sed 's/-//'
-}
+# pkgver() {
+#   cd gamescope
+#   git describe --tags | sed 's/-//'
+# }
 
 build() {
   arch-meson gamescope build \

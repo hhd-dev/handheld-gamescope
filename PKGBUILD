@@ -1,7 +1,7 @@
 _pkgname=gamescope
 pkgname=handheld-${_pkgname}
-pkgver=g37cc4d36
-pkgrel=3
+pkgver=3.14.24
+pkgrel=2
 pkgdesc='The Bazzite gamescope forked for Arch. May have extra fixes or a tiny bit held back.'
 arch=(x86_64)
 url=https://github.com/ValveSoftware/gamescope
@@ -45,7 +45,7 @@ makedepends=(
   vulkan-headers
   wayland-protocols
 )
-_tag=37cc4d368b3804215b9b4bb2719a3ac2b64cf2e6
+_tag=${pkgver}
 source=(
   git+https://github.com/ValveSoftware/gamescope.git#tag=${_tag}
   git+https://github.com/Joshua-Ashton/wlroots.git
@@ -68,9 +68,11 @@ source=(
   revert-299bc34.patch
   # https://github.com/ValveSoftware/gamescope/pull/1231
   1231.patch
+  # Temporary until newer tag than 3.14.24
+  upstream.patch
 )
 
-b2sums=('7f36e6ca039b2e0be6d89d2bb287b269f7ec5394e6587cabf202a737aaf95ee8f883d4ef44e674ff8ed09b2a1cb56fb4acdb1764fe14f5e1709f80ba0f40a3c8'
+b2sums=('272b4df0782c6dfe3f428e396f4e2ab93594e6b086bba25d0116995883e84944788760a24feb0d8a61d615c4d4ecee9d7648a5cdcee128620aaa9d24d2606284'
         'SKIP'
         'SKIP'
         'SKIP'
@@ -83,7 +85,8 @@ b2sums=('7f36e6ca039b2e0be6d89d2bb287b269f7ec5394e6587cabf202a737aaf95ee8f883d4e
         '3eae10a5244500ac00e9cd2f79a48923c024d79210dfe73295da69b4e300507cf80511852350d1c9177f79774036f2924fd8330a4ff6cc43046b794f059a0f86'
         '548bdbc47c3d802127318cfcb83347c30907cc849a32896d6dc6e49d4641bc619e741f81869a44d3c0e063beba6c21a9be5a56e9679220414c7bc16b2698794d'
         '4fcd400f117051398c5d4130a9fb5c1668e17c2ccf050a69b8eb931f1b827d74cc24cc90bf150b5c7712f8d9d7bcfe082aa09719a27b36454c9927320593b922'
-        '27c3ced2ae92055bcd43744708be3810f8560d0bf509e9c003cffbe87dfe31439b5452334d0c05e27c1a0f5b2b89eb94f6419546ed8a84cf8f5e937aceddf75d')
+        '27c3ced2ae92055bcd43744708be3810f8560d0bf509e9c003cffbe87dfe31439b5452334d0c05e27c1a0f5b2b89eb94f6419546ed8a84cf8f5e937aceddf75d'
+        'e913fc720c3d8d9ee6d6496a80239c6a41af8da32693b6efc4c2817a238d86a6257a82524bdd8dca47948ff6568f7c67ce3f8bcc484dbbc00d791feaa9882325')
 
 provides=("$_pkgname")
 conflicts=("$_pkgname")

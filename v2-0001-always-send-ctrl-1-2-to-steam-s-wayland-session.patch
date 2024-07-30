@@ -1,0 +1,52 @@
+From 9cee7ac112a2cefbb64c0ece78e9d043a649bb6e Mon Sep 17 00:00:00 2001
+From: Antheas Kapenekakis <git@antheas.dev>
+Date: Tue, 30 Jul 2024 10:23:39 +0300
+Subject: [PATCH v2] always send ctrl+1/2 to steam's wayland session
+
+---
+ src/wlserver.cpp | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/src/wlserver.cpp b/src/wlserver.cpp
+index 1852be9..f647090 100644
+--- a/src/wlserver.cpp
++++ b/src/wlserver.cpp
+@@ -369,7 +369,12 @@ static void wlserver_handle_key(struct wl_listener *listener, void *data)
+ 		keysym == XKB_KEY_XF86AudioLowerVolume ||
+ 		keysym == XKB_KEY_XF86AudioRaiseVolume ||
+ 		keysym == XKB_KEY_XF86PowerOff;
+-	if ( ( event->state == WL_KEYBOARD_KEY_STATE_PRESSED || event->state == WL_KEYBOARD_KEY_STATE_RELEASED ) && forbidden_key )
++
++	// Check for steam keys (ctrl + 1/2)
++	bool is_steam_shortcut = (keyboard->wlr->modifiers.depressed & WLR_MODIFIER_CTRL) && (keysym == XKB_KEY_1 ||
++																						 keysym == XKB_KEY_2);
++
++	if ( ( event->state == WL_KEYBOARD_KEY_STATE_PRESSED || event->state == WL_KEYBOARD_KEY_STATE_RELEASED ) && (forbidden_key || is_steam_shortcut) )
+ 	{
+ 		// Always send volume+/- to root server only, to avoid it reaching the game.
+ 		struct wlr_surface *old_kb_surf = wlserver.kb_focus_surface;
+@@ -378,7 +383,21 @@ static void wlserver_handle_key(struct wl_listener *listener, void *data)
+ 		{
+ 			wlserver_keyboardfocus( new_kb_surf, false );
+ 			wlr_seat_set_keyboard( wlserver.wlr.seat, keyboard->wlr );
++			// Send modifiers to steam for steam shortcuts to work
++			if (is_steam_shortcut)
++				wlr_seat_keyboard_notify_modifiers(wlserver.wlr.seat, &keyboard->wlr->modifiers);
+ 			wlr_seat_keyboard_notify_key( wlserver.wlr.seat, event->time_msec, event->keycode, event->state );
++			if (is_steam_shortcut && old_kb_surf != new_kb_surf) {
++				// If we changed keyboard focus, remove depressed modifiers
++				// to avoid steam thinking they are still pressed.
++				struct wlr_keyboard_modifiers mods = {
++					.depressed = 0,
++					.latched = keyboard->wlr->modifiers.latched,
++					.locked = keyboard->wlr->modifiers.locked,
++					.group = keyboard->wlr->modifiers.group,
++				};
++				wlr_seat_keyboard_notify_modifiers(wlserver.wlr.seat, &mods);
++			}
+ 			wlserver_keyboardfocus( old_kb_surf, false );
+ 			return;
+ 		}
+-- 
+2.45.2
+
